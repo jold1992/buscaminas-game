@@ -1,0 +1,16 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencias (no aplica, proyecto sin build)
+node_modules/
+
+# Archivos de entorno
+.env
+.env.local

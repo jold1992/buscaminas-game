@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscaminas Game</title>
+    <link rel="shortcut icon" href="device-gamepad-2.svg" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Contenedor principal del juego -->
+    <div class="ms-root ms-scanline" id="app">
+
+        <!-- Título y subtítulo -->
+        <div class="ms-header">// BUSCAMINAS //</div>
+        <div class="ms-subheader">SISTEMA DE DETECCIÓN DE MINAS v1.0</div>
+
+        <!-- Selector de dificultad -->
+        <div class="ms-diff-row" id="diff-row">
+            <button class="ms-diff-btn active" onclick="setDiff('easy')">[FÁCIL 9x9]</button>
+            <button class="ms-diff-btn" onclick="setDiff('medium')">[MEDIO 16x16]</button>
+            <button class="ms-diff-btn" onclick="setDiff('hard')">[DIFÍCIL 30x16]</button>
+        </div>
+
+        <!-- HUD: minas restantes, reinicio, temporizador -->
+        <div class="ms-hud">
+            <div class="ms-hud-item">
+                <div class="ms-hud-label">MINAS</div>
+                <div class="ms-hud-val" id="mine-count">10</div>
+            </div>
+            <button class="ms-restart-btn" onclick="restart()">[REINICIAR]</button>
+            <div class="ms-hud-item">
+                <div class="ms-hud-label">TIEMPO</div>
+                <div class="ms-hud-val" id="timer">000</div>
+            </div>
+        </div>
+
+        <!-- Tablero de juego (se genera dinámicamente por JS) -->
+        <div class="ms-grid-wrap">
+            <div class="ms-grid" id="grid"></div>
+        </div>
+
+        <!-- Barra de estado con instrucciones -->
+        <div class="ms-status" id="status">CLIC IZQUIERDO: revelar | CLIC DERECHO: marcar bandera</div>
+
+        <!-- Overlay de fin de juego (se muestra al ganar o perder) -->
+        <div class="ms-overlay" id="overlay">
+            <div class="ms-overlay-title" id="overlay-title"></div>
+            <div class="ms-overlay-sub" id="overlay-sub"></div>
+            <button class="ms-overlay-btn" id="overlay-btn" onclick="restart()">[REINICIAR]</button>
+        </div>
+    </div>
+
+    <!-- Lógica del juego (separada en archivo externo) -->
+    <script src="game.js"></script>
+</body>
+
+</html>

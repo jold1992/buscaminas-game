@@ -1,0 +1,584 @@
+/* ============================================
+   BUSCAMINAS — Estilos principales
+   Tema terminal retro (verde sobre negro)
+   ============================================ */
+
+/* Fuentes externas de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+/* ============================================
+   RESET Y BODY
+   Evita la franja blanca en la parte inferior
+   y establece el fondo oscuro base
+   ============================================ */
+body {
+    margin: 0;
+    background: #0a0f0a;
+    min-height: 100vh;
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL (.ms-root)
+   Envuelve todo el juego, incluye efecto
+   scanline para look retro
+   ============================================ */
+.ms-root {
+    font-family: 'Share Tech Mono', monospace;
+    background: #0a0f0a;
+    color: #33ff33;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #1a2e1a;
+    position: relative;
+    -webkit-touch-callout: none;
+}
+
+/* ============================================
+   HEADER Y SUBHEADER
+   Título y subtítulo del juego
+   ============================================ */
+.ms-header {
+    font-family: 'VT323', monospace;
+    font-size: 28px;
+    color: #33ff33;
+    letter-spacing: 4px;
+    text-align: center;
+    margin-bottom: 4px;
+    text-shadow: 0 0 8px #00ff0044;
+}
+
+.ms-subheader {
+    font-size: 11px;
+    color: #1a8c1a;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+/* ============================================
+   HUD (Heads-Up Display)
+   Barra superior con minas restantes,
+   botón de reinicio y temporizador
+   ============================================ */
+.ms-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0d150d;
+    border: 1px solid #1a4a1a;
+    padding: 8px 14px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    font-size: 13px;
+}
+
+.ms-hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.ms-hud-label {
+    font-size: 9px;
+    color: #1a8c1a;
+    letter-spacing: 1px;
+}
+
+.ms-hud-val {
+    font-family: 'VT323', monospace;
+    font-size: 26px;
+    color: #33ff33;
+    line-height: 1;
+}
+
+/* Temporizador en rojo cuando se pierde */
+.ms-hud-val.red {
+    color: #ff3333;
+}
+
+/* ============================================
+   BOTÓN DE REINICIO
+   ============================================ */
+.ms-restart-btn {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    background: #0d150d;
+    border: 1px solid #1a4a1a;
+    color: #33ff33;
+    padding: 4px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.15s;
+}
+
+.ms-restart-btn:hover {
+    background: #1a2e1a;
+    border-color: #33ff33;
+}
+
+/* ============================================
+   SELECTOR DE DIFICULTAD
+   Fila de botones para cambiar la dificultad
+   ============================================ */
+.ms-diff-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    justify-content: center;
+}
+
+.ms-diff-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    background: #0d150d;
+    border: 1px solid #1a3a1a;
+    color: #1a8c1a;
+    padding: 4px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+}
+
+.ms-diff-btn:hover,
+.ms-diff-btn.active {
+    background: #1a2e1a;
+    color: #33ff33;
+    border-color: #33ff33;
+}
+
+/* ============================================
+   GRID Y CELDAS
+   Tablero de juego y sus celdas individuales
+   El tamaño de celda se calcula dinámicamente
+   en JS según el viewport
+   ============================================ */
+.ms-grid-wrap {
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+    -webkit-overflow-scrolling: touch;
+}
+
+.ms-grid {
+    display: inline-grid;
+    gap: 2px;
+    background: #060c06;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #1a3a1a;
+}
+
+.ms-cell {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'VT323', monospace;
+    font-size: 17px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    border: 1px solid;
+}
+
+/* Estados de celda */
+
+/* Celda sin revelar */
+.ms-cell.hidden {
+    background: #0d1f0d;
+    border-color: #1a4a1a;
+    color: #33ff33;
+}
+
+.ms-cell.hidden:hover {
+    background: #152815;
+    border-color: #33ff33;
+}
+
+/* Celda ya revelada (vacía o con número) */
+.ms-cell.revealed {
+    background: #060c06;
+    border-color: #0a180a;
+    cursor: default;
+}
+
+/* Celda marcada con bandera */
+.ms-cell.flagged {
+    background: #0d1f0d;
+    border-color: #cc7700;
+    color: #ffaa00;
+}
+
+/* Mina que explotó (la que se clickeó) */
+.ms-cell.mine-hit {
+    background: #3a0000;
+    border-color: #ff3333;
+    color: #ff3333;
+}
+
+/* Minas reveladas al perder (no explotadas) */
+.ms-cell.mine-show {
+    background: #060c06;
+    border-color: #550000;
+    color: #cc2222;
+}
+
+/* ============================================
+   COLORES POR NÚMERO DE ADYACENTES
+   Cada número tiene un color diferente
+   ============================================ */
+.ms-cell.n1 { color: #33ff33; }
+.ms-cell.n2 { color: #00ffcc; }
+.ms-cell.n3 { color: #ff9933; }
+.ms-cell.n4 { color: #3399ff; }
+.ms-cell.n5 { color: #ff4444; }
+.ms-cell.n6 { color: #aa88ff; }
+.ms-cell.n7 { color: #ff66cc; }
+.ms-cell.n8 { color: #888888; }
+
+/* ============================================
+   BARRA DE ESTADO
+   Texto informativo en la parte inferior
+   ============================================ */
+.ms-status {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    min-height: 18px;
+    color: #1a8c1a;
+}
+
+.ms-status.win {
+    color: #33ff33;
+}
+
+.ms-status.lose {
+    color: #ff3333;
+}
+
+/* ============================================
+   EFECTO SCANLINE
+   Líneas horizontales sobre el contenedor
+   para simular una pantalla CRT retro
+   ============================================ */
+.ms-scanline {
+    position: relative;
+    overflow: hidden;
+}
+
+.ms-scanline::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(transparent 0px, transparent 3px, rgba(0, 0, 0, 0.10) 3px, rgba(0, 0, 0, 0.10) 4px);
+    border-radius: 8px;
+}
+
+/* ============================================
+   ANIMACIONES DE EXPLOSIÓN DE MINAS
+   Se aplican con retraso escalonado según
+   la distancia a la mina activada
+   ============================================ */
+
+/* Animación de la mina que explota: escala + destello rojo */
+@keyframes mineExplode {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+        background: #ff3333;
+        box-shadow: 0 0 12px #ff3333;
+    }
+    40% {
+        transform: scale(1.4);
+        opacity: 1;
+        background: #5a0000;
+        box-shadow: 0 0 8px #ff333388;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        background: #3a0000;
+        box-shadow: none;
+    }
+}
+
+/* Animación de las demás minas: escala + rotación */
+@keyframes mineShowReveal {
+    0% {
+        transform: scale(0) rotate(90deg);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.2) rotate(-10deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.ms-cell.mine-hit.animating {
+    animation: mineExplode 0.5s ease-out forwards;
+}
+
+.ms-cell.mine-show.animating {
+    animation: mineShowReveal 0.4s ease-out forwards;
+    opacity: 0;
+}
+
+/* ============================================
+   OVERLAY DE GAME OVER / VICTORIA
+   Pantalla oscura que cubre el tablero
+   al ganar o perder
+   ============================================ */
+.ms-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    z-index: 10;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    backdrop-filter: blur(2px);
+}
+
+.ms-overlay.visible {
+    display: flex;
+}
+
+/* Título del overlay (GAME OVER / VICTORIA) */
+.ms-overlay-title {
+    font-family: 'VT323', monospace;
+    font-size: 42px;
+    letter-spacing: 6px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.ms-overlay-title.lose {
+    color: #ff3333;
+}
+
+.ms-overlay-title.win {
+    color: #33ff33;
+}
+
+/* Subtítulo del overlay */
+.ms-overlay-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+}
+
+.ms-overlay-sub.lose {
+    color: #cc4444;
+}
+
+.ms-overlay-sub.win {
+    color: #1a8c1a;
+}
+
+/* Botón de reinicio dentro del overlay */
+.ms-overlay-btn {
+    font-family: 'VT323', monospace;
+    font-size: 22px;
+    background: transparent;
+    border: 2px solid;
+    padding: 8px 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 3px;
+    transition: all 0.2s;
+}
+
+.ms-overlay-btn.lose {
+    color: #ff3333;
+    border-color: #ff3333;
+}
+
+.ms-overlay-btn.lose:hover {
+    background: #ff333322;
+    box-shadow: 0 0 16px #ff333344;
+}
+
+.ms-overlay-btn.win {
+    color: #33ff33;
+    border-color: #33ff33;
+}
+
+.ms-overlay-btn.win:hover {
+    background: #33ff3322;
+    box-shadow: 0 0 16px #33ff3344;
+}
+
+/* ============================================
+   ANIMACIONES DEL OVERLAY
+   Entrada escalonada de título, subtítulo
+   y botón del overlay
+   ============================================ */
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes overlayTitlePop {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.ms-overlay.visible {
+    animation: overlayFadeIn 0.3s ease-out;
+}
+
+.ms-overlay-title {
+    animation: overlayTitlePop 0.5s ease-out 0.2s both;
+}
+
+.ms-overlay-sub {
+    animation: overlayFadeIn 0.4s ease-out 0.5s both;
+}
+
+.ms-overlay-btn {
+    animation: overlayFadeIn 0.4s ease-out 0.7s both;
+}
+
+/* Feedback táctil al presionar una celda oculta */
+.ms-cell.hidden:active {
+    background: #152815;
+    border-color: #33ff33;
+}
+
+/* Indicador visual de long press (sin uso actualmente) */
+.ms-longpress-indicator {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #ffaa00;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.ms-longpress-indicator.active {
+    opacity: 1;
+}
+
+/* ============================================
+   MEDIA QUERIES — MÓVIL (max 600px)
+   Ajustes de tamaño para pantallas pequeñas
+   ============================================ */
+@media (max-width: 600px) {
+    .ms-root {
+        padding: 0.6rem;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .ms-header {
+        font-size: 20px;
+        letter-spacing: 2px;
+        margin-bottom: 2px;
+    }
+
+    .ms-subheader {
+        font-size: 9px;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .ms-hud {
+        padding: 6px 10px;
+        margin-bottom: 10px;
+        font-size: 11px;
+    }
+
+    .ms-hud-val {
+        font-size: 22px;
+    }
+
+    .ms-hud-label {
+        font-size: 8px;
+    }
+
+    .ms-restart-btn {
+        font-size: 16px;
+        padding: 4px 10px;
+    }
+
+    .ms-diff-row {
+        gap: 4px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .ms-diff-btn {
+        font-size: 10px;
+        padding: 6px 8px;
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+    }
+
+    .ms-grid {
+        gap: 1px;
+        padding: 4px;
+    }
+
+    .ms-cell {
+        font-size: 14px;
+    }
+
+    .ms-status {
+        font-size: 9px;
+        letter-spacing: 1px;
+        margin-top: 8px;
+    }
+
+    .ms-overlay-title {
+        font-size: 30px;
+        letter-spacing: 4px;
+    }
+
+    .ms-overlay-sub {
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-align: center;
+        padding: 0 1rem;
+    }
+
+    .ms-overlay-btn {
+        font-size: 18px;
+        padding: 8px 22px;
+    }
+}
+
+/* ============================================
+   MEDIA QUERIES — PANTALLAS MUY PEQUEÑAS (max 380px)
+   Ajustes adicionales para teléfonos compactos
+   ============================================ */
+@media (max-width: 380px) {
+    .ms-header {
+        font-size: 17px;
+    }
+
+    .ms-diff-btn {
+        font-size: 9px;
+        padding: 5px 6px;
+    }
+}
