@@ -18,6 +18,44 @@ body {
 }
 
 /* ============================================
+   FOOTER
+   Información del desarrollador con enlaces
+   a GitHub y LinkedIn
+   ============================================ */
+.ms-footer {
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    padding: 24px 16px 20px;
+    font-size: 12px;
+    color: #1a8c1a;
+    letter-spacing: 1px;
+}
+
+.ms-footer strong {
+    color: #33ff33;
+}
+
+.ms-footer-links {
+    margin-top: 6px;
+}
+
+.ms-footer-links a {
+    color: #33ff33;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.ms-footer-links a:hover {
+    color: #00ffcc;
+    text-decoration: underline;
+}
+
+.ms-footer-sep {
+    margin: 0 8px;
+    color: #1a4a1a;
+}
+
+/* ============================================
    CONTENEDOR PRINCIPAL (.ms-root)
    Envuelve todo el juego, incluye efecto
    scanline para look retro
@@ -565,6 +603,11 @@ body {
     .ms-overlay-btn {
         font-size: 18px;
         padding: 8px 22px;
+    }
+
+    .ms-footer {
+        padding: 16px 12px 14px;
+        font-size: 10px;
     }
 }
 
