@@ -44,4 +44,4 @@ buscaminas-game/
 
 ## Despliegue
 
-Desplegado en [GitHub Pages](https://tu-usuario.github.io/buscaminas-game/).
+Desplegado en [GitHub Pages](https://jold1992.github.io/buscaminas-game/).
