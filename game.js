@@ -59,6 +59,9 @@ let touchStartPos = null;
 // Indica si el long press ya fue activado
 let longPressTriggered = false;
 
+// Timestamp del último long press completado (para ignorar clicks fantasma)
+let longPressEndedAt = 0;
+
 // Detecta si el dispositivo soporta touch
 let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
@@ -261,6 +264,9 @@ function reveal(r, c) {
 function handleClick(r, c) {
     // Ignorar clics si el juego ya terminó
     if (gameOver || gameWon) return;
+
+    // Ignorar clicks fantasma posteriores a un long press en móvil
+    if (Date.now() - longPressEndedAt < 500) return;
 
     // No revelar celdas con bandera o ya reveladas
     if (flagged[r][c]) return;
@@ -536,30 +542,35 @@ function renderGrid() {
             let lastTap = 0;
 
             // Touch end: detecta doble toque (300ms) para chord,
-            // o ignora si fue un long press (bandera)
+            // o registra el fin del long press para el guard de handleClick
             cell.addEventListener('touchend', (e) => {
                 clearTimeout(longPressTimer);
 
-                // Si fue long press, cancelar el click normal
                 if (longPressTriggered) {
-                    e.preventDefault();
+                    // Long press completado: registrar timestamp y prevenir click fantasma
+                    longPressEndedAt = Date.now();
                     longPressTriggered = false;
+                    e.preventDefault();
                     return;
                 }
 
-                // Detección de doble toque
-                const now = Date.now();
-                if (now - lastTap < 300) {
-                    e.preventDefault();
-                    handleDoubleClick(_r, _c);
-                    lastTap = 0;
-                } else {
+                // Detección de doble toque (solo en celdas reveladas)
+                if (revealed[_r][_c]) {
+                    const now = Date.now();
+                    if (now - lastTap < 300) {
+                        e.preventDefault();
+                        handleDoubleClick(_r, _c);
+                        lastTap = 0;
+                        return;
+                    }
                     lastTap = now;
                 }
             });
 
             // Touch start: inicia timer de long press (400ms) para bandera
             cell.addEventListener('touchstart', (e) => {
+                // Limpiar timer anterior por seguridad
+                clearTimeout(longPressTimer);
                 longPressTriggered = false;
                 touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 
